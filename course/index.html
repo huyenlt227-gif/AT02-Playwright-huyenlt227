@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AutoPath AI Course — Automation for Manual Testers</title>
+<meta name="description" content="A bilingual course that turns Manual Testers into Automation Testers using the AutoPath AI Playwright framework.">
+<link rel="stylesheet" href="assets/styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="stage">
+    <header class="topbar">
+      <button class="menu-btn" id="menu-btn" aria-label="Toggle menu">☰</button>
+      <div class="crumb" id="crumb"><b>Syllabus</b></div>
+      <div class="spacer"></div>
+      <span class="lang-switch">EN · VI</span>
+    </header>
+
+    <main class="content">
+      <section class="hero">
+        <span class="tag">Test Suite · 12 Test Cases</span>
+        <h1>From Manual Tester<br>to <span class="accent">Automation Tester</span></h1>
+        <p class="lede">
+          A hands-on, bilingual course built around the <strong>AutoPath AI</strong>
+          Playwright framework. Each lesson is a test case: read it, run it,
+          verify it, mark it passed.
+        </p>
+        <div class="meta-row">
+          <span>12 lessons</span>
+          <span>Playwright + TypeScript</span>
+          <span>Real e-commerce project</span>
+          <span>AI-assisted</span>
+        </div>
+      </section>
+
+      <div class="bil">
+        <p><span class="lang">EN</span> The course teaches the same skills a Manual Tester already has — observing a screen, breaking a flow into steps, writing expected results — and maps them onto automation concepts. Every chapter references real files in this repository, so you learn by reading and running the actual framework.</p>
+        <p><span class="lang vi">VI</span> Khóa học chuyển những kỹ năng Manual Tester đã có — quan sát màn hình, chia luồng thành bước, viết expected result — sang các khái niệm automation. Mỗi bài đều trỏ về file thật trong repo, bạn học bằng cách đọc và chạy chính framework này.</p>
+      </div>
+
+      <section class="syllabus-board">
+        <div class="board-head">
+          <h2>The Test Suite</h2>
+          <span class="suite-count" id="suite-count">0/12 passed</span>
+        </div>
+        <div id="board-phases"></div>
+      </section>
+
+      <div class="about-grid">
+        <div class="about-card">
+          <h3>Who this is for</h3>
+          <ul>
+            <li>Manual Testers starting their automation journey</li>
+            <li>QA leads who want a team-shared training path</li>
+            <li>Anyone curious how a Playwright framework is put together</li>
+          </ul>
+        </div>
+        <div class="about-card">
+          <h3>How to study</h3>
+          <ul>
+            <li>Read the <strong>EN</strong> and <strong>VI</strong> sections of each lesson</li>
+            <li>Open the referenced files in this repo</li>
+            <li>Run the suggested commands yourself</li>
+            <li>Finish each lesson's exercise, then mark it <strong>passed</strong></li>
+          </ul>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-foot">AutoPath AI Course · built on the AutoPath AI Playwright framework</footer>
+  </div>
+</div>
+
+<script src="assets/nav.js"></script>
+<script src="assets/main.js"></script>
+<script>
+  (function () {
+    var board = document.getElementById('board-phases');
+    var html = '';
+    PHASES.forEach(function (phase) {
+      var items = LESSONS.filter(function (l) { return l.phase === phase.id; });
+      html += '<div class="phase-block">';
+      html += '<div class="phase-title">' + phase.en + '<span class="ph-vi">' + phase.vi + '</span></div>';
+      items.forEach(function (l) {
+        html += '<a class="lesson-row" data-lesson-id="' + l.id + '" href="' + l.file + '">'
+          + '<span class="tc-chip">TC-' + l.num + '</span>'
+          + '<span class="lr-titles"><div class="lr-en">' + l.en + '</div><div class="lr-vi">' + l.vi + '</div></span>'
+          + '<span class="lr-meta"><span>' + l.level + '</span><span>' + l.minutes + ' min</span></span>'
+          + '<span class="lr-state"></span>'
+          + '</a>';
+      });
+      html += '</div>';
+    });
+    board.innerHTML = html;
+    if (window.__renderBoardStates) window.__renderBoardStates();
+  })();
+</script>
+</body>
+</html>

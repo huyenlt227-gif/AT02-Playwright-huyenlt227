@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TC-10 · Reports &amp; Failure Evidence — AutoPath AI Course</title>
+<link rel="stylesheet" href="assets/styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="stage">
+    <header class="topbar">
+      <button class="menu-btn" id="menu-btn" aria-label="Toggle menu">☰</button>
+      <div class="crumb" id="crumb"></div>
+      <div class="spacer"></div>
+      <span class="lang-switch">EN · VI</span>
+    </header>
+
+    <main class="content">
+      <section class="tc-card">
+        <div class="tc-strip">
+          <span class="tc-badge">TC-10</span>
+          <span class="tc-status" id="tc-status">TODO</span>
+          <span class="tc-meta"><span class="lv">Core</span><span>≈ 30 min</span></span>
+        </div>
+        <div class="tc-body">
+          <h1 class="tc-title-en">Reports &amp; Failure Evidence</h1>
+          <p class="tc-title-vi">Report &amp; Bằng chứng khi test fail</p>
+          <div class="tc-grid">
+            <div class="tc-cell">
+              <div class="cell-label">Preconditions · Tiền đề</div>
+              <ul>
+                <li>Hoàn thành TC-09</li>
+                <li>Đã chạy ít nhất một lần <code class="inline">npm test</code></li>
+              </ul>
+            </div>
+            <div class="tc-cell expected">
+              <div class="cell-label">Expected Result · Sau bài này bạn làm được</div>
+              <ul>
+                <li>Biết mọi artifact được sinh khi test fail</li>
+                <li>Đọc HTML report theo góc nhìn nghiệp vụ</li>
+                <li>Hiểu vai trò của <code class="inline">test.step</code> trong report</li>
+                <li>Biết nơi lưu log, screenshot, video, trace</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <h2><span class="sec-no">10.1</span>Every Failure Leaves Evidence</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> As a Manual Tester you attach screenshots to bug reports. The framework does the same — automatically, for every failed test:</p>
+        <p><span class="lang vi">VI</span> Là Manual Tester, bạn đính screenshot vào bug report. Framework cũng làm vậy — tự động, cho mọi test fail:</p>
+      </div>
+
+      <table class="data">
+        <thead>
+          <tr><th>Artifact · Bằng chứng</th><th>Location · Nơi lưu</th><th>Purpose · Mục đích</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Screenshot</td><td><code class="inline">test-results/&lt;test&gt;/test-failed-1.png</code></td><td>Thấy chính xác trạng thái màn hình lúc fail</td></tr>
+          <tr><td>Video</td><td><code class="inline">test-results/&lt;test&gt;/video.webm</code></td><td>Xem lại toàn bộ diễn biến</td></tr>
+          <tr><td>Trace</td><td><code class="inline">test-results/&lt;test&gt;/trace.zip</code></td><td>Inspect từng action, network call, console message</td></tr>
+          <tr><td>HTML report</td><td><code class="inline">playwright-report/index.html</code></td><td>Duyệt toàn bộ kết quả, mở bằng <code class="inline">npm run report</code></td></tr>
+          <tr><td>Log file</td><td><code class="inline">logs/&lt;date&gt;/&lt;test-title&gt;.log</code></td><td>Nhật ký text từng bước của test</td></tr>
+        </tbody>
+      </table>
+
+      <div class="code"><span class="code-lang">TypeScript</span>
+<pre><code>// playwright.config.ts — capture settings
+use: {
+  screenshot: 'only-on-failure',
+  video: 'retain-on-failure',
+  trace: 'retain-on-failure',
+},</code></pre>
+      </div>
+
+      <h2><span class="sec-no">10.2</span>test.step: Business-Level Reporting</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> Raw Playwright reports show technical actions ("click", "fill"). This framework wraps flows in <code class="inline">test.step(...)</code> so the report shows <strong>business steps</strong> — exactly like your manual test case steps:</p>
+        <p><span class="lang vi">VI</span> Report Playwright thô chỉ hiện thao tác kỹ thuật ("click", "fill"). Framework này bọc các luồng trong <code class="inline">test.step(...)</code> để report hiện <strong>bước nghiệp vụ</strong> — giống hệt các bước trong test case thủ công của bạn:</p>
+      </div>
+
+      <div class="code"><span class="code-lang">TypeScript</span>
+<pre><code>await test.step('Step 4 - Payment: place the order', async () =&gt; {
+  await paymentPage.expectPaymentStep();
+  await paymentPage.enterAdditionalInfo(paymentData.additionalInfo);
+  if (paymentData.agreeToTerms) {
+    await paymentPage.agreeToTerms();
+  }
+  await paymentPage.completeOrder();
+});
+
+await test.step('Step 5 - Confirmation: capture and verify the order code', async () =&gt; {
+  await confirmationPage.expectConfirmation();
+  const orderCode = await confirmationPage.expectOrderCodeNotEmpty();
+  log.info(`Order code received: ${orderCode}`);
+});</code></pre>
+      </div>
+
+      <div class="callout note">
+        <span class="ico">i</span>
+        <div><strong>When a test fails at "Step 4 - Payment",</strong> you instantly know where the flow broke — no need to decode raw actions. This is the report speaking your language.</div>
+      </div>
+
+      <h2><span class="sec-no">10.3</span>The Log File</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> The <code class="inline">log</code> fixture (TC-06) writes a per-test text log. Open <code class="inline">utils/logger.ts</code>: every <code class="inline">log.info(...)</code> in a test lands both in the terminal and in <code class="inline">logs/&lt;date&gt;/&lt;test-title&gt;-&lt;timestamp&gt;.log</code>.</p>
+        <p><span class="lang vi">VI</span> Fixture <code class="inline">log</code> (TC-06) ghi log text riêng cho từng test. Mở <code class="inline">utils/logger.ts</code>: mọi <code class="inline">log.info(...)</code> trong test đều xuất hiện cả ở terminal lẫn trong <code class="inline">logs/&lt;date&gt;/&lt;test-title&gt;-&lt;timestamp&gt;.log</code>.</p>
+      </div>
+
+      <div class="code"><span class="code-lang">bash</span>
+<pre><code>[2026-10-05 09:12:33.041] [START]  Complete the 5-step checkout...
+[2026-10-05 09:12:45.120] [INFO]  Order code received: ABC123XYZ
+[2026-10-05 09:12:45.121] [INFO]  TEST FINISHED</code></pre>
+      </div>
+
+      <h2><span class="sec-no">10.4</span>Reading the HTML Report</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> <code class="inline">npm run report</code> opens the interactive report. From a Manual Tester's perspective:</p>
+        <p><span class="lang vi">VI</span> <code class="inline">npm run report</code> mở report tương tác. Theo góc nhìn Manual Tester:</p>
+      </div>
+
+      <ul>
+        <li><strong>Overview:</strong> tổng số test, pass/fail/skip, thời lượng — như bảng tổng kết test run.</li>
+        <li><strong>Test detail:</strong> click một test → danh sách <em>business steps</em>, mỗi step có thời gian riêng.</li>
+        <li><strong>Errors:</strong> thông điệp fail + assertion message bạn tự viết (TC-04).</li>
+        <li><strong>Trace viewer:</strong> mở trace của test fail để xem từng action, network và console.</li>
+      </ul>
+
+      <div class="exercise">
+        <div class="ex-title">Exercise · Bài tập</div>
+        <ol>
+          <li>Cố tình làm một test fail: đổi một expected message trong <code class="inline">data/login/login-data.json</code> thành chuỗi sai.</li>
+          <li>Chạy <code class="inline">npm run test:login</code> — test fail.</li>
+          <li>Mở <code class="inline">test-results/</code> và liệt kê các artifact được sinh ra (screenshot, video, trace).</li>
+          <li>Mở file log của test fail trong <code class="inline">logs/&lt;date&gt;/</code> — tìm dòng lỗi.</li>
+          <li>Hoàn tác dữ liệu, chạy lại cho xanh.</li>
+        </ol>
+      </div>
+
+      <section class="test-report">
+        <div class="tr-head"><span class="dot"></span> Test Report · Báo cáo kiểm thử</div>
+        <div class="tr-body">
+          <p><span class="lang">EN</span> You know where every piece of evidence lives. Next: the systematic way to debug a failure using that evidence.</p>
+          <p><span class="lang vi">VI</span> Bạn biết mọi bằng chứng nằm ở đâu. Bài tiếp theo: cách debug lỗi một cách hệ thống dựa trên các bằng chứng đó.</p>
+          <button class="btn-pass" id="btn-pass"><span class="tick">+</span><span class="btn-label">Mark lesson as passed</span></button>
+        </div>
+      </section>
+    </main>
+
+    <nav class="pager" id="pager"></nav>
+    <footer class="site-foot">AutoPath AI Course · TC-10</footer>
+  </div>
+</div>
+<script src="assets/nav.js"></script>
+<script src="assets/main.js"></script>
+</body>
+</html>

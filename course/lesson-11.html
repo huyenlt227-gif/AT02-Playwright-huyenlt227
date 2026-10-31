@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TC-11 · Debugging Failures — AutoPath AI Course</title>
+<link rel="stylesheet" href="assets/styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="stage">
+    <header class="topbar">
+      <button class="menu-btn" id="menu-btn" aria-label="Toggle menu">☰</button>
+      <div class="crumb" id="crumb"></div>
+      <div class="spacer"></div>
+      <span class="lang-switch">EN · VI</span>
+    </header>
+
+    <main class="content">
+      <section class="tc-card">
+        <div class="tc-strip">
+          <span class="tc-badge">TC-11</span>
+          <span class="tc-status" id="tc-status">TODO</span>
+          <span class="tc-meta"><span class="lv">Advanced</span><span>≈ 40 min</span></span>
+        </div>
+        <div class="tc-body">
+          <h1 class="tc-title-en">Debugging Failures</h1>
+          <p class="tc-title-vi">Debug khi test thất bại</p>
+          <div class="tc-grid">
+            <div class="tc-cell">
+              <div class="cell-label">Preconditions · Tiền đề</div>
+              <ul>
+                <li>Hoàn thành TC-10 (biết nơi lưu evidence)</li>
+                <li>Có một test fail để thực hành</li>
+              </ul>
+            </div>
+            <div class="tc-cell expected">
+              <div class="cell-label">Expected Result · Sau bài này bạn làm được</div>
+              <ul>
+                <li>Debug theo quy trình hệ thống, không đoán mò</li>
+                <li>Phân loại 4 nguyên nhân fail phổ biến của dự án này</li>
+                <li>Dùng trace viewer để truy vết</li>
+                <li>Hợp tác với AI để debug đúng cách</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <h2><span class="sec-no">11.1</span>A Systematic Method</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> Debugging is not guessing. Follow this order — each step narrows the cause:</p>
+        <p><span class="lang vi">VI</span> Debug không phải đoán mò. Làm theo thứ tự này — mỗi bước thu hẹp nguyên nhân:</p>
+      </div>
+
+      <table class="data">
+        <thead>
+          <tr><th>#</th><th>Step · Bước</th><th>Where · Làm ở đâu</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>Đọc thông điệp lỗi + step fail</td><td>Terminal / HTML report</td></tr>
+          <tr><td>2</td><td>Xem assertion message (bạn tự viết)</td><td>Report → Errors</td></tr>
+          <tr><td>3</td><td>Đọc file log của test</td><td><code class="inline">logs/&lt;date&gt;/&lt;test&gt;.log</code></td></tr>
+          <tr><td>4</td><td>Xem screenshot tại thời điểm fail</td><td><code class="inline">test-results/&lt;test&gt;/</code></td></tr>
+          <tr><td>5</td><td>Mở trace, xem action cuối cùng trước khi fail</td><td>Trace viewer</td></tr>
+          <tr><td>6</td><td>Chạy lại test (đôi khi lỗi là tạm thời)</td><td>Terminal</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout note">
+        <span class="ico">i</span>
+        <div><strong>Reproduce first.</strong> A bug you cannot reproduce is a rumor. Re-run the single test before changing anything: <code class="inline">npx playwright test tests/user/login/login.spec.ts --project=login</code>.</div>
+      </div>
+
+      <h2><span class="sec-no">11.2</span>The Four Classic Failures in This Project</h2>
+
+      <h3>1 · "Invalid login credentials" on every login</h3>
+      <div class="bil">
+        <p><span class="lang">EN</span> The demo site <strong>resets its data periodically</strong>. When it does, the documented accounts stop working. Verify the credentials manually in a browser; if the account is gone, register a new one and update <code class="inline">.env</code>, then re-run the setup.</p>
+        <p><span class="lang vi">VI</span> Site demo <strong>reset dữ liệu định kỳ</strong>. Khi reset, tài khoản mẫu ngừng hoạt động. Kiểm tra tài khoản thủ công trên trình duyệt; nếu mất, đăng ký tài khoản mới, cập nhật <code class="inline">.env</code>, rồi chạy lại setup.</p>
+      </div>
+
+      <h3>2 · HTTP 419 (CSRF token mismatch) when adding to cart</h3>
+      <div class="bil">
+        <p><span class="lang">EN</span> The shared demo occasionally rejects POST requests. This is a <strong>site-side</strong> issue — retry the test. Not a framework defect.</p>
+        <p><span class="lang vi">VI</span> Demo dùng chung thỉnh thoảng từ chối request POST. Đây là lỗi <strong>phía site</strong> — chạy lại test. Không phải lỗi framework.</p>
+      </div>
+
+      <h3>3 · Popup intercepted my click</h3>
+      <div class="bil">
+        <p><span class="lang">EN</span> The demo popup / cookie banner can appear late and swallow clicks. The framework handles this in <code class="inline">BasePage.closeAnnoyingPopups()</code> and <code class="inline">LoginPage.login()</code>. If you see a "element intercepted" error, check that your new page object calls <code class="inline">closeAnnoyingPopups()</code> after <code class="inline">goto()</code>.</p>
+        <p><span class="lang vi">VI</span> Popup demo / banner cookie có thể xuất hiện muộn và nuốt cú click. Framework xử lý trong <code class="inline">BasePage.closeAnnoyingPopups()</code> và <code class="inline">LoginPage.login()</code>. Nếu gặp lỗi "element intercepted", kiểm tra page object mới của bạn có gọi <code class="inline">closeAnnoyingPopups()</code> sau <code class="inline">goto()</code> không.</p>
+      </div>
+
+      <h3>4 · Browser executable not found</h3>
+      <div class="bil">
+        <p><span class="lang">EN</span> Version mismatch between Playwright and its browsers. Fix: <code class="inline">npx playwright install</code>.</p>
+        <p><span class="lang vi">VI</span> Lệch phiên bản giữa Playwright và trình duyệt. Cách xử lý: <code class="inline">npx playwright install</code>.</p>
+      </div>
+
+      <h2><span class="sec-no">11.3</span>Using the Trace Viewer</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> The trace is the most powerful evidence: it records every action, network request and console message. Open a trace from the HTML report (test detail → "Trace") or directly:</p>
+        <p><span class="lang vi">VI</span> Trace là bằng chứng mạnh nhất: nó ghi lại mọi action, request mạng và console message. Mở trace từ HTML report (chi tiết test → "Trace") hoặc trực tiếp:</p>
+      </div>
+
+      <div class="code"><span class="code-lang">bash</span>
+<pre><code>npx playwright show-trace test-results/&lt;test&gt;/trace.zip</code></pre>
+      </div>
+
+      <div class="bil">
+        <p><span class="lang">EN</span> In the trace: step through actions on the left, watch the page snapshot on the right, and inspect the network tab for failed requests (e.g. a 419).</p>
+        <p><span class="lang vi">VI</span> Trong trace: tua từng action bên trái, xem snapshot trang bên phải, và kiểm tra tab network cho request lỗi (ví dụ 419).</p>
+      </div>
+
+      <h2><span class="sec-no">11.4</span>Debugging with AI — the Right Way</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> The README defines the AI "Debug" role. Give the AI <strong>context, not mystery</strong>:</p>
+        <p><span class="lang vi">VI</span> README định nghĩa vai trò AI "Debug". Hãy đưa AI <strong>bối cảnh, không phải câu đố</strong>:</p>
+      </div>
+
+      <div class="code"><span class="code-lang">text</span>
+<pre><code>My test failed at "Step 4 - Payment: place the order".
+Error: expect(locator).toBeVisible() timed out...
+The screenshot shows the payment page with no "Place Order" button.
+The log shows: "Order code received:" never printed.
+What is the likely cause and what should I check?</code></pre>
+      </div>
+
+      <div class="callout warn">
+        <span class="ico">!</span>
+        <div><strong>You stay responsible.</strong> AI suggests causes; you verify by re-running the test. Never mark a bug "fixed" on AI's word alone.</div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-title">Exercise · Bài tập</div>
+        <ol>
+          <li>Chọn một test fail (hoặc tự tạo bằng cách đổi dữ liệu sai như TC-10).</li>
+          <li>Áp dụng đúng quy trình 6 bước ở mục 11.1, ghi lại kết quả mỗi bước.</li>
+          <li>Mở trace của test đó và xác định action cuối cùng thành công.</li>
+          <li>Viết một prompt debug cho AI theo mẫu 11.4, chạy thử, rồi tự xác nhận lại bằng cách chạy lại test.</li>
+        </ol>
+      </div>
+
+      <section class="test-report">
+        <div class="tr-head"><span class="dot"></span> Test Report · Báo cáo kiểm thử</div>
+        <div class="tr-body">
+          <p><span class="lang">EN</span> You can debug systematically and collaborate with AI without losing ownership. Next: the capstone — build a new module end-to-end.</p>
+          <p><span class="lang vi">VI</span> Bạn đã debug có hệ thống và cộng tác với AI mà vẫn giữ quyền sở hữu. Bài cuối: capstone — tự xây một module mới từ đầu đến cuối.</p>
+          <button class="btn-pass" id="btn-pass"><span class="tick">+</span><span class="btn-label">Mark lesson as passed</span></button>
+        </div>
+      </section>
+    </main>
+
+    <nav class="pager" id="pager"></nav>
+    <footer class="site-foot">AutoPath AI Course · TC-11</footer>
+  </div>
+</div>
+<script src="assets/nav.js"></script>
+<script src="assets/main.js"></script>
+</body>
+</html>

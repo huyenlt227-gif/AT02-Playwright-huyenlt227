@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TC-12 · Capstone &amp; Next Steps — AutoPath AI Course</title>
+<link rel="stylesheet" href="assets/styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="stage">
+    <header class="topbar">
+      <button class="menu-btn" id="menu-btn" aria-label="Toggle menu">☰</button>
+      <div class="crumb" id="crumb"></div>
+      <div class="spacer"></div>
+      <span class="lang-switch">EN · VI</span>
+    </header>
+
+    <main class="content">
+      <section class="tc-card">
+        <div class="tc-strip">
+          <span class="tc-badge">TC-12</span>
+          <span class="tc-status" id="tc-status">TODO</span>
+          <span class="tc-meta"><span class="lv">Capstone</span><span>≈ 60 min</span></span>
+        </div>
+        <div class="tc-body">
+          <h1 class="tc-title-en">Capstone &amp; Next Steps</h1>
+          <p class="tc-title-vi">Bài tập tổng hợp &amp; Lộ trình tiếp theo</p>
+          <div class="tc-grid">
+            <div class="tc-cell">
+              <div class="cell-label">Preconditions · Tiền đề</div>
+              <ul>
+                <li>Hoàn thành TC-01 → TC-11</li>
+                <li>Môi trường chạy được toàn bộ suite</li>
+              </ul>
+            </div>
+            <div class="tc-cell expected">
+              <div class="cell-label">Expected Result · Sau bài này bạn làm được</div>
+              <ul>
+                <li>Tự xây một module test mới hoàn chỉnh</li>
+                <li>Áp dụng đủ POM, fixtures, data, evidence</li>
+                <li>Biết lộ trình học tiếp: API, CI/CD, visual</li>
+                <li>Vận hành AI đúng vai trò, giữ trách nhiệm</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <h2><span class="sec-no">12.1</span>The Capstone: Build a "Product Search" Module</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> Build a new module from scratch, following the framework's own conventions. Goal: a test that opens the storefront, searches for a product by name, and asserts the result list shows the expected product.</p>
+        <p><span class="lang vi">VI</span> Tự xây một module mới từ đầu, theo đúng quy ước của framework. Mục tiêu: một test mở storefront, tìm kiếm sản phẩm theo tên, và assert danh sách kết quả hiển thị đúng sản phẩm.</p>
+      </div>
+
+      <h3>Step 1 · Explore the page</h3>
+      <div class="bil">
+        <p><span class="lang">EN</span> Open the storefront manually, use DevTools to find the search input and the result container. Write down the stable selectors — this is your locator research.</p>
+        <p><span class="lang vi">VI</span> Mở storefront bằng tay, dùng DevTools tìm ô tìm kiếm và vùng kết quả. Ghi lại selector ổn định — đây là bước nghiên cứu locator của bạn.</p>
+      </div>
+
+      <h3>Step 2 · Create the page object</h3>
+      <div class="bil">
+        <p><span class="lang">EN</span> Create <code class="inline">pages/user/SearchPage.ts</code> extending <code class="inline">BasePage</code>, with a <code class="inline">search(keyword)</code> method and an assertion helper. Remember: <code class="inline">goto()</code> then <code class="inline">closeAnnoyingPopups()</code>.</p>
+        <p><span class="lang vi">VI</span> Tạo <code class="inline">pages/user/SearchPage.ts</code> kế thừa <code class="inline">BasePage</code>, với method <code class="inline">search(keyword)</code> và helper assert. Nhớ: <code class="inline">goto()</code> rồi <code class="inline">closeAnnoyingPopups()</code>.</p>
+      </div>
+
+      <h3>Step 3 · Register the fixture</h3>
+      <div class="bil">
+        <p><span class="lang">EN</span> Add <code class="inline">searchPage</code> to <code class="inline">fixtures/base.fixture.ts</code> so tests receive it out of the box.</p>
+        <p><span class="lang vi">VI</span> Thêm <code class="inline">searchPage</code> vào <code class="inline">fixtures/base.fixture.ts</code> để test nhận sẵn page object.</p>
+      </div>
+
+      <h3>Step 4 · Put the keyword in data</h3>
+      <div class="bil">
+        <p><span class="lang">EN</span> Create <code class="inline">data/search/search-data.json</code> with the keyword, and read it via <code class="inline">JsonHelper.readData&lt;T&gt;()</code>.</p>
+        <p><span class="lang vi">VI</span> Tạo <code class="inline">data/search/search-data.json</code> chứa từ khóa, đọc qua <code class="inline">JsonHelper.readData&lt;T&gt;()</code>.</p>
+      </div>
+
+      <h3>Step 5 · Write the test</h3>
+      <div class="bil">
+        <p><span class="lang">EN</span> Create <code class="inline">tests/user/search/search.spec.ts</code> with <code class="inline">test.step</code> blocks, a meaningful assertion message, and <code class="inline">log.info</code> calls.</p>
+        <p><span class="lang vi">VI</span> Tạo <code class="inline">tests/user/search/search.spec.ts</code> với các khối <code class="inline">test.step</code>, assertion message có nghĩa, và các lệnh <code class="inline">log.info</code>.</p>
+      </div>
+
+      <h3>Step 6 · Run, verify, evidence</h3>
+      <div class="bil">
+        <p><span class="lang">EN</span> Run it. If it fails, debug with the TC-11 method. Confirm the report, log and (on failure) artifacts are produced.</p>
+        <p><span class="lang vi">VI</span> Chạy nó. Nếu fail, debug theo phương pháp TC-11. Xác nhận report, log và (khi fail) các artifact được sinh ra.</p>
+      </div>
+
+      <h2><span class="sec-no">12.2</span>Checklist: Everything You Applied</h2>
+      <table class="data">
+        <thead>
+          <tr><th>Concept · Khái niệm</th><th>Lesson</th><th>Used in capstone · Dùng trong capstone</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Locator ổn định + auto-wait</td><td>TC-04</td><td>Selector của ô tìm kiếm</td></tr>
+          <tr><td>Page Object Model</td><td>TC-05</td><td><code class="inline">SearchPage</code></td></tr>
+          <tr><td>Fixtures</td><td>TC-06</td><td><code class="inline">searchPage</code> trong <code class="inline">base.fixture.ts</code></td></tr>
+          <tr><td>storageState</td><td>TC-07</td><td>Dùng session đã lưu (nếu cần đăng nhập)</td></tr>
+          <tr><td>External test data</td><td>TC-08</td><td><code class="inline">data/search/search-data.json</code></td></tr>
+          <tr><td>Business steps + evidence</td><td>TC-10</td><td><code class="inline">test.step</code>, log, report</td></tr>
+          <tr><td>Systematic debugging</td><td>TC-11</td><td>Khi test fail</td></tr>
+        </tbody>
+      </table>
+
+      <h2><span class="sec-no">12.3</span>Roadmap: What to Learn Next</h2>
+      <table class="data">
+        <thead>
+          <tr><th>Topic · Chủ đề</th><th>Why · Vì sao nên học</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Playwright Codegen</td><td>Ghi lại thao tác thủ công thành code — cây cầu đầu tiên từ manual sang automation</td></tr>
+          <tr><td>API testing (Playwright request)</td><td>Test backend nhanh, ổn định hơn UI; kết hợp UI + API cho luồng phức tạp</td></tr>
+          <tr><td>CI/CD (GitHub Actions…)</td><td>Chạy suite tự động sau mỗi commit — automation thực thụ</td></tr>
+          <tr><td>Visual testing</td><td>So sánh giao diện theo pixel — bù cho giới hạn "không nhìn được" của robot</td></tr>
+          <tr><td>Data-driven testing</td><td>Một test chạy với nhiều bộ dữ liệu — nhân sức mạnh test case lên</td></tr>
+        </tbody>
+      </table>
+
+      <h2><span class="sec-no">12.4</span>Working with AI, Forever</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> The five AI roles from TC-01 remain your operating model: <strong>Explain</strong> concepts, <strong>Guide</strong> tasks, <strong>Generate</strong> code within the framework, <strong>Review</strong> for bad practices, <strong>Debug</strong> with full context. In every case: AI proposes, you dispose. Validate by running.</p>
+        <p><span class="lang vi">VI</span> Năm vai trò AI từ TC-01 vẫn là mô hình vận hành của bạn: <strong>Explain</strong> khái niệm, <strong>Guide</strong> tác vụ, <strong>Generate</strong> code trong phạm vi framework, <strong>Review</strong> các thói quen xấu, <strong>Debug</strong> với đầy đủ bối cảnh. Trong mọi trường hợp: AI đề xuất, bạn quyết định. Xác nhận bằng cách chạy.</p>
+      </div>
+
+      <div class="callout pass">
+        <span class="ico">✓</span>
+        <div><strong>You made it.</strong> You started as a Manual Tester and now read, run, extend and debug a Playwright framework. The robot does the repetition; you keep the judgment.</div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-title">Final Exercise · Bài tập cuối</div>
+        <ol>
+          <li>Hoàn thành module Product Search theo 6 bước ở mục 12.1.</li>
+          <li>Chạy toàn bộ suite (<code class="inline">npm test</code>) — mọi thứ xanh.</li>
+          <li>Mở HTML report và chụp lại màn hình tổng kết.</li>
+          <li>Viết 3 dòng "điều tôi học được" và 1 điều bạn muốn học tiếp.</li>
+          <li>Đánh dấu bài này PASSED — suite của bạn đã đủ 12/12.</li>
+        </ol>
+      </div>
+
+      <section class="test-report">
+        <div class="tr-head"><span class="dot"></span> Test Report · Báo cáo kiểm thử</div>
+        <div class="tr-body">
+          <p><span class="lang">EN</span> Congratulations — you completed the AutoPath AI Course. Mark the final test case passed to close the suite.</p>
+          <p><span class="lang vi">VI</span> Chúc mừng — bạn đã hoàn thành AutoPath AI Course. Đánh dấu test case cuối cùng PASSED để khép lại suite.</p>
+          <button class="btn-pass" id="btn-pass"><span class="tick">+</span><span class="btn-label">Mark lesson as passed</span></button>
+        </div>
+      </section>
+    </main>
+
+    <nav class="pager" id="pager"></nav>
+    <footer class="site-foot">AutoPath AI Course · TC-12</footer>
+  </div>
+</div>
+<script src="assets/nav.js"></script>
+<script src="assets/main.js"></script>
+</body>
+</html>

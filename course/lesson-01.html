@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TC-01 · Automation Basics — AutoPath AI Course</title>
+<link rel="stylesheet" href="assets/styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="stage">
+    <header class="topbar">
+      <button class="menu-btn" id="menu-btn" aria-label="Toggle menu">☰</button>
+      <div class="crumb" id="crumb"></div>
+      <div class="spacer"></div>
+      <span class="lang-switch">EN · VI</span>
+    </header>
+
+    <main class="content">
+      <section class="tc-card">
+        <div class="tc-strip">
+          <span class="tc-badge">TC-01</span>
+          <span class="tc-status" id="tc-status">TODO</span>
+          <span class="tc-meta"><span class="lv">Beginner</span><span>≈ 20 min</span></span>
+        </div>
+        <div class="tc-body">
+          <h1 class="tc-title-en">Automation Basics for Manual Testers</h1>
+          <p class="tc-title-vi">Nền tảng Automation cho Manual Tester</p>
+          <div class="tc-grid">
+            <div class="tc-cell">
+              <div class="cell-label">Preconditions · Tiền đề</div>
+              <ul>
+                <li>Bạn đã viết test case thủ công (manual test case)</li>
+                <li>Bạn biết khái niệm regression / smoke / sanity</li>
+              </ul>
+            </div>
+            <div class="tc-cell expected">
+              <div class="cell-label">Expected Result · Sau bài này bạn làm được</div>
+              <ul>
+                <li>Phân biệt rõ manual vs automation testing</li>
+                <li>Biết khi nào nên / không nên automate</li>
+                <li>Hiểu phạm vi của dự án AutoPath AI</li>
+                <li>Biết AI hỗ trợ gì — và trách nhiệm thuộc về ai</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <h2><span class="sec-no">1.1</span>What is Automation Testing?</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> Automation testing means writing a program that <strong>performs your manual test steps</strong> — clicking, typing, reading the screen — and then <strong>checks the results</strong> against what you expected. The program is a robot tester that never gets tired, never skips a step, and runs in minutes what takes you hours.</p>
+        <p><span class="lang vi">VI</span> Automation testing nghĩa là viết một chương trình <strong>thực hiện đúng các bước test thủ công</strong> của bạn — click, gõ, đọc màn hình — rồi <strong>đối chiếu kết quả</strong> với expected result. Chương trình đó là một "robot tester": không mệt, không bỏ sót bước, và chạy trong vài phút thứ mà bạn mất hàng giờ.</p>
+      </div>
+
+      <table class="data">
+        <thead>
+          <tr><th>Aspect · Khía cạnh</th><th>Manual Testing</th><th>Automation Testing</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Speed · Tốc độ</td><td>Slow, human-paced</td><td>Fast, repeatable in minutes</td></tr>
+          <tr><td>Exploratory skill</td><td>Excellent — you notice the unexpected</td><td>Poor — only checks what it was told</td></tr>
+          <tr><td>Regression suites</td><td>Expensive, boring, error-prone</td><td>Cheap to re-run, consistent</td></tr>
+          <tr><td>Judgment &amp; UX feel</td><td>Human judgment</td><td>No judgment — needs explicit assertions</td></tr>
+          <tr><td>Best at</td><td>New features, usability, ad-hoc checks</td><td>Repetition, data-heavy flows, CI gates</td></tr>
+        </tbody>
+      </table>
+
+      <h2><span class="sec-no">1.2</span>What Automation Cannot Do</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> Automation is a <strong>tool, not a replacement</strong>. It cannot judge whether a screen "looks right", cannot explore a new feature creatively, and cannot tell you if the business logic is sensible. Someone must still design the test cases, decide what is worth automating, and review the results. That someone is you — the Manual Tester.</p>
+        <p><span class="lang vi">VI</span> Automation là <strong>công cụ, không thay thế con người</strong>. Nó không đánh giá được "giao diện có ổn không", không khám phá tính năng mới một cách sáng tạo, và không biết logic nghiệp vụ có hợp lý hay không. Ai đó vẫn phải thiết kế test case, quyết định nên automate gì, và review kết quả. Người đó chính là bạn — Manual Tester.</p>
+      </div>
+
+      <div class="callout note">
+        <span class="ico">i</span>
+        <div><strong>Mental model:</strong> automation converts your <em>test cases</em> into <em>code</em>. A good automation tester is first a good manual tester. Your existing skill is the foundation, not a disadvantage.</div>
+      </div>
+
+      <h2><span class="sec-no">1.3</span>Meet the Project: AutoPath AI</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> This course is built on <strong>AutoPath AI</strong>, a Playwright + TypeScript framework that automates a real e-commerce demo site (<code class="inline">cms.anhtester.com</code>). It covers seven business modules, each with its own test file:</p>
+        <p><span class="lang vi">VI</span> Khóa học này được xây trên <strong>AutoPath AI</strong>, framework Playwright + TypeScript tự động hóa một website e-commerce demo thật (<code class="inline">cms.anhtester.com</code>). Framework bao phủ bảy module nghiệp vụ, mỗi module một file test riêng:</p>
+      </div>
+
+      <table class="data">
+        <thead>
+          <tr><th>#</th><th>Module</th><th>Test file · File test</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>Customer Login</td><td><code class="inline">tests/user/login/login.spec.ts</code></td></tr>
+          <tr><td>2</td><td>Manage Profile</td><td><code class="inline">tests/user/profile/update-profile.spec.ts</code></td></tr>
+          <tr><td>3</td><td>Get Product Information</td><td><code class="inline">tests/user/product/get-product-information.spec.ts</code></td></tr>
+          <tr><td>4</td><td>Add Two Products to Cart</td><td><code class="inline">tests/user/cart/add-two-products.spec.ts</code></td></tr>
+          <tr><td>5</td><td>Five-Step Checkout</td><td><code class="inline">tests/user/checkout/checkout.spec.ts</code></td></tr>
+          <tr><td>6</td><td>Admin Verification</td><td><code class="inline">tests/admin/verify-product-detail.spec.ts</code></td></tr>
+          <tr><td>7</td><td>Full E2E Flow</td><td><code class="inline">tests/e2e/customer-checkout-flow.spec.ts</code></td></tr>
+        </tbody>
+      </table>
+
+      <p>Open <code class="inline">README.md</code> in the repo root — it is the project's own manual, written for Manual Testers.</p>
+
+      <h2><span class="sec-no">1.4</span>The Role of AI in This Project</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> AI plays five clearly-scoped roles. In every case the <strong>Manual Tester reviews the output and stays responsible</strong> for the result:</p>
+        <p><span class="lang vi">VI</span> AI đóng năm vai trò được giới hạn rõ. Trong mọi trường hợp, <strong>Manual Tester vẫn review kết quả và chịu trách nhiệm cuối cùng</strong>:</p>
+      </div>
+
+      <table class="data">
+        <thead>
+          <tr><th>Role</th><th>Meaning · Ý nghĩa</th><th>Example · Ví dụ</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Explain</strong></td><td>Giải thích khái niệm framework bằng ngôn ngữ đơn giản</td><td>"Explain what storageState does"</td></tr>
+          <tr><td><strong>Guide</strong></td><td>Hướng dẫn từng bước một tác vụ</td><td>"How do I run only the login tests?"</td></tr>
+          <tr><td><strong>Generate</strong></td><td>Sinh code trong phạm vi framework</td><td>"Write a page-object method for search"</td></tr>
+          <tr><td><strong>Review</strong></td><td>Rà soát code: locator xấu, dữ liệu hardcode…</td><td>"Review the framework for bad practices"</td></tr>
+          <tr><td><strong>Debug</strong></td><td>Phân tích lỗi từ log / screenshot / trace</td><td>"This test failed at step 4 — why?"</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout warn">
+        <span class="ico">!</span>
+        <div><strong>Golden rule:</strong> AI writes suggestions, <em>you</em> validate them. Never trust generated code or a generated explanation without running the test and confirming the result yourself.</div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-title">Exercise · Bài tập</div>
+        <ol>
+          <li>Chọn một luồng nghiệp vụ bạn test thủ công thường xuyên nhất.</li>
+          <li>Viết 3 test case thủ công cho luồng đó (steps + expected results).</li>
+          <li>Với mỗi test case, ghi chú: bước nào lặp lại nhiều lần → ứng viên tốt cho automation; bước nào cần cảm nhận thị giác → giữ manual.</li>
+          <li>Đối chiếu với bảng 7 module ở trên: bạn sẽ đặt test case của mình vào module nào?</li>
+        </ol>
+      </div>
+
+      <section class="test-report">
+        <div class="tr-head"><span class="dot"></span> Test Report · Báo cáo kiểm thử</div>
+        <div class="tr-body">
+          <p><span class="lang">EN</span> You now know what automation can and cannot do, and how AutoPath AI is organized. Next: set up the environment and walk the project structure.</p>
+          <p><span class="lang vi">VI</span> Bạn đã hiểu automation làm được gì, không làm được gì, và cách AutoPath AI được tổ chức. Bài tiếp theo: cài đặt môi trường và đi qua cấu trúc dự án.</p>
+          <button class="btn-pass" id="btn-pass"><span class="tick">+</span><span class="btn-label">Mark lesson as passed</span></button>
+        </div>
+      </section>
+    </main>
+
+    <nav class="pager" id="pager"></nav>
+    <footer class="site-foot">AutoPath AI Course · TC-01</footer>
+  </div>
+</div>
+<script src="assets/nav.js"></script>
+<script src="assets/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TC-03 · Your First Test — AutoPath AI Course</title>
+<link rel="stylesheet" href="assets/styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="stage">
+    <header class="topbar">
+      <button class="menu-btn" id="menu-btn" aria-label="Toggle menu">☰</button>
+      <div class="crumb" id="crumb"></div>
+      <div class="spacer"></div>
+      <span class="lang-switch">EN · VI</span>
+    </header>
+
+    <main class="content">
+      <section class="tc-card">
+        <div class="tc-strip">
+          <span class="tc-badge">TC-03</span>
+          <span class="tc-status" id="tc-status">TODO</span>
+          <span class="tc-meta"><span class="lv">Beginner</span><span>≈ 30 min</span></span>
+        </div>
+        <div class="tc-body">
+          <h1 class="tc-title-en">Your First Test</h1>
+          <p class="tc-title-vi">Test đầu tiên của bạn</p>
+          <div class="tc-grid">
+            <div class="tc-cell">
+              <div class="cell-label">Preconditions · Tiền đề</div>
+              <ul>
+                <li>Hoàn thành TC-02 (môi trường sẵn sàng)</li>
+                <li>File <code class="inline">tests/user/login/login.spec.ts</code> đã có sẵn</li>
+              </ul>
+            </div>
+            <div class="tc-cell expected">
+              <div class="cell-label">Expected Result · Sau bài này bạn làm được</div>
+              <ul>
+                <li>Đọc và hiểu anatomy của một spec file</li>
+                <li>Giải thích <code class="inline">describe</code>, <code class="inline">test</code>, <code class="inline">test.step</code>, <code class="inline">expect</code></li>
+                <li>Chạy test login và đọc kết quả</li>
+                <li>Mở HTML report sau khi chạy</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <h2><span class="sec-no">3.1</span>The Anatomy of a Spec File</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> Open <code class="inline">tests/user/login/login.spec.ts</code>. A Playwright test file is a series of <strong>test cases</strong> — exactly like the test cases you write in Excel or TestRail, but in code:</p>
+        <p><span class="lang vi">VI</span> Mở <code class="inline">tests/user/login/login.spec.ts</code>. Một file test Playwright là chuỗi các <strong>test case</strong> — giống hệt test case bạn viết trong Excel hay TestRail, nhưng bằng code:</p>
+      </div>
+
+      <div class="code"><span class="code-lang">TypeScript</span>
+<pre><code>import { test, expect } from '../../../fixtures/base.fixture';
+import { Env } from '../../../utils/env';
+import { JsonHelper } from '../../../utils/json-helper';
+
+const loginData = JsonHelper.readData&lt;{
+  invalidEmail: string;
+  invalidPassword: string;
+  expectedInvalidCredentialsMessage: string;
+}&gt;('login/login-data.json');
+
+test.describe('Customer Login', () =&gt; {
+  test('Login with an invalid email shows an error message', async ({ loginPage, log }) =&gt; {
+    await test.step('Open the customer login page', async () =&gt; {
+      await loginPage.open();
+    });
+
+    await test.step('Submit the form with an invalid email', async () =&gt; {
+      const message = await loginPage.loginExpectFailure(
+        loginData.invalidEmail,
+        Env.CUSTOMER_PASSWORD,
+      );
+      log.info(`Error message received: "${message}"`);
+      expect(message).toContain(loginData.expectedInvalidCredentialsMessage);
+    });
+  });
+});</code></pre>
+      </div>
+
+      <table class="data">
+        <thead>
+          <tr><th>Keyword</th><th>Role · Vai trò</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code class="inline">test.describe('...')</code></td><td>Nhóm các test case (giống test suite / folder)</td></tr>
+          <tr><td><code class="inline">test('...', async ({ ... }) =&gt; {})</code></td><td>Một test case. Title là tên hiển thị trong report</td></tr>
+          <tr><td><code class="inline">test.step('...', async () =&gt; {})</code></td><td>Chia test case thành các bước nghiệp vụ — report hiển thị từng bước</td></tr>
+          <tr><td><code class="inline">expect(...).toContain(...)</code></td><td>Assertion: kiểm tra kết quả thực tế với expected</td></tr>
+          <tr><td><code class="inline">{ loginPage, log }</code></td><td>Fixture: Playwright tự tạo sẵn page object và logger cho bạn (TC-06)</td></tr>
+        </tbody>
+      </table>
+
+      <h2><span class="sec-no">3.2</span>Read a Test Like a Manual Tester</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> Compare the first test case with a manual test case you would write:</p>
+        <p><span class="lang vi">VI</span> So sánh test case đầu tiên với test case thủ công bạn thường viết:</p>
+      </div>
+
+      <table class="data">
+        <thead>
+          <tr><th>Manual test case</th><th>Playwright equivalent · Tương đương trong Playwright</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Precondition: mở trang login</td><td><code class="inline">loginPage.open()</code></td></tr>
+          <tr><td>Steps: nhập email sai, nhập password, bấm Login</td><td><code class="inline">loginPage.loginExpectFailure(email, password)</code></td></tr>
+          <tr><td>Expected: hiện thông báo "Invalid login credentials"</td><td><code class="inline">expect(message).toContain('Invalid login credentials')</code></td></tr>
+          <tr><td>Actual: ghi vào test report</td><td><code class="inline">log.info(...)</code> → ghi vào file log</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout note">
+        <span class="ico">i</span>
+        <div><strong>Key insight:</strong> a good automation test is a manual test case translated line by line. Your manual-testing habit of writing clear steps is exactly what makes good automation tests.</div>
+      </div>
+
+      <h2><span class="sec-no">3.3</span>Run It</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> Run only the login module:</p>
+        <p><span class="lang vi">VI</span> Chạy riêng module login:</p>
+      </div>
+
+      <div class="code"><span class="code-lang">bash</span>
+<pre><code>npm run test:login</code></pre>
+      </div>
+
+      <div class="bil">
+        <p><span class="lang">EN</span> Watch the terminal: Playwright prints each test with a <strong>green ✓ (passed)</strong> or <strong>red ✘ (failed)</strong>, plus the duration. The login project runs without a saved session, so it performs a <em>real</em> login against the demo site.</p>
+        <p><span class="lang vi">VI</span> Quan sát terminal: Playwright in từng test với <strong>✓ xanh (passed)</strong> hoặc <strong>✘ đỏ (failed)</strong> kèm thời gian. Project login chạy không dùng session đã lưu, nên nó thực hiện đăng nhập <em>thật</em> trên site demo.</p>
+      </div>
+
+      <h2><span class="sec-no">3.4</span>Read the HTML Report</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> After the run, open the interactive report:</p>
+        <p><span class="lang vi">VI</span> Sau khi chạy, mở report tương tác:</p>
+      </div>
+
+      <div class="code"><span class="code-lang">bash</span>
+<pre><code>npm run report</code></pre>
+      </div>
+
+      <div class="bil">
+        <p><span class="lang">EN</span> The report shows every test case, its steps, duration, and — on failure — the error, screenshot, video and trace. This is your "test execution log" in a familiar format.</p>
+        <p><span class="lang vi">VI</span> Report hiển thị mọi test case, từng bước, thời gian, và — khi fail — lỗi, screenshot, video và trace. Đây chính là "nhật ký thực thi" của bạn dưới dạng quen thuộc.</p>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-title">Exercise · Bài tập</div>
+        <ol>
+          <li>Chạy <code class="inline">npm run test:login</code> và ghi lại số test passed / failed.</li>
+          <li>Mở HTML report, click vào test "Login with an invalid email…", xem danh sách các step.</li>
+          <li>Trong <code class="inline">login.spec.ts</code>, thêm test case thứ 4: login với email <strong>trống</strong> (empty). Gợi ý: tái sử dụng <code class="inline">loginExpectFailure</code> với <code class="inline">''</code>.</li>
+          <li>Chạy lại và xác nhận test mới hiển thị trong report.</li>
+        </ol>
+      </div>
+
+      <section class="test-report">
+        <div class="tr-head"><span class="dot"></span> Test Report · Báo cáo kiểm thử</div>
+        <div class="tr-body">
+          <p><span class="lang">EN</span> You wrote, ran and reported your first test. Next: the two building blocks behind every line — locators and assertions.</p>
+          <p><span class="lang vi">VI</span> Bạn đã viết, chạy và đọc report cho test đầu tiên. Bài tiếp theo: hai khối xây dựng đằng sau mọi dòng code — locators và assertions.</p>
+          <button class="btn-pass" id="btn-pass"><span class="tick">+</span><span class="btn-label">Mark lesson as passed</span></button>
+        </div>
+      </section>
+    </main>
+
+    <nav class="pager" id="pager"></nav>
+    <footer class="site-foot">AutoPath AI Course · TC-03</footer>
+  </div>
+</div>
+<script src="assets/nav.js"></script>
+<script src="assets/main.js"></script>
+</body>
+</html>

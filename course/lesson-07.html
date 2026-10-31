@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TC-07 · storageState &amp; Auth Setup — AutoPath AI Course</title>
+<link rel="stylesheet" href="assets/styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="stage">
+    <header class="topbar">
+      <button class="menu-btn" id="menu-btn" aria-label="Toggle menu">☰</button>
+      <div class="crumb" id="crumb"></div>
+      <div class="spacer"></div>
+      <span class="lang-switch">EN · VI</span>
+    </header>
+
+    <main class="content">
+      <section class="tc-card">
+        <div class="tc-strip">
+          <span class="tc-badge">TC-07</span>
+          <span class="tc-status" id="tc-status">TODO</span>
+          <span class="tc-meta"><span class="lv">Core</span><span>≈ 40 min</span></span>
+        </div>
+        <div class="tc-body">
+          <h1 class="tc-title-en">storageState &amp; Auth Setup</h1>
+          <p class="tc-title-vi">storageState &amp; Đăng nhập một lần</p>
+          <div class="tc-grid">
+            <div class="tc-cell">
+              <div class="cell-label">Preconditions · Tiền đề</div>
+              <ul>
+                <li>Hoàn thành TC-06 (fixtures)</li>
+                <li>Đã xem <code class="inline">playwright.config.ts</code></li>
+              </ul>
+            </div>
+            <div class="tc-cell expected">
+              <div class="cell-label">Expected Result · Sau bài này bạn làm được</div>
+              <ul>
+                <li>Giải thích storageState là gì</li>
+                <li>Hiểu setup project sinh session như thế nào</li>
+                <li>Biết project nào dùng session, project nào không, và vì sao</li>
+                <li>Biết cách xử lý khi session hết hạn</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <h2><span class="sec-no">7.1</span>The Problem: Logging In Every Test</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> Most tests need a logged-in user. Logging in at the start of every test is slow and repetitive — and the demo site even rate-limits logins. The solution: <strong>log in once, save the session, reuse it</strong>.</p>
+        <p><span class="lang vi">VI</span> Hầu hết test cần người dùng đã đăng nhập. Đăng nhập đầu mỗi test vừa chậm vừa lặp lại — site demo còn giới hạn số lần login. Giải pháp: <strong>đăng nhập một lần, lưu session, tái sử dụng</strong>.</p>
+      </div>
+
+      <div class="code"><span class="code-lang">bash</span>
+<pre><code>setup/user-auth.setup.ts  →  storage/user-state.json
+setup/admin-auth.setup.ts →  storage/admin-state.json</code></pre>
+      </div>
+
+      <h2><span class="sec-no">7.2</span>The Setup Project</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> <code class="inline">setup/user-auth.setup.ts</code> is a special test that logs in and snapshots the browser's session (cookies + storage) to a JSON file:</p>
+        <p><span class="lang vi">VI</span> <code class="inline">setup/user-auth.setup.ts</code> là một test đặc biệt: đăng nhập rồi chụp lại session của trình duyệt (cookie + storage) vào một file JSON:</p>
+      </div>
+
+      <div class="code"><span class="code-lang">TypeScript</span>
+<pre><code>import { test as setup } from '@playwright/test';
+import { Env } from '../utils/env';
+import { LoginPage } from '../pages/user/LoginPage';
+
+setup('authenticate as customer', async ({ page }) =&gt; {
+  const loginPage = new LoginPage(page);
+  await loginPage.open();
+  await loginPage.loginSuccess(Env.CUSTOMER_EMAIL, Env.CUSTOMER_PASSWORD);
+  await page.context().storageState({ path: 'storage/user-state.json' });
+});</code></pre>
+      </div>
+
+      <div class="bil">
+        <p><span class="lang">EN</span> The magic line is <code class="inline">page.context().storageState({ path: ... })</code> — it exports the session so other tests can import it.</p>
+        <p><span class="lang vi">VI</span> Dòng quan trọng là <code class="inline">page.context().storageState({ path: ... })</code> — nó xuất session ra để test khác import lại.</p>
+      </div>
+
+      <h2><span class="sec-no">7.3</span>Wiring It Up in playwright.config.ts</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> The config defines projects. Projects can <strong>depend</strong> on the setup projects and <strong>apply</strong> the saved session:</p>
+        <p><span class="lang vi">VI</span> Config định nghĩa các project. Project có thể <strong>phụ thuộc</strong> vào setup project và <strong>áp dụng</strong> session đã lưu:</p>
+      </div>
+
+      <div class="code"><span class="code-lang">TypeScript</span>
+<pre><code>const userStorageState = { storageState: 'storage/user-state.json' };
+
+projects: [
+  { name: 'setup-user', testMatch: /setup\/user-auth\.setup\.ts/ },
+  {
+    name: 'chromium',
+    testMatch: /tests\/user\/(?!login).*\.spec\.ts|tests\/e2e\/.*\.spec\.ts/,
+    use: { ...desktopChrome, ...userStorageState },
+    dependencies: ['setup-user'],
+  },
+]</code></pre>
+      </div>
+
+      <table class="data">
+        <thead>
+          <tr><th>Project</th><th>storageState</th><th>Why · Vì sao</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code class="inline">setup-user</code> / <code class="inline">setup-admin</code></td><td>—</td><td>Sinh session, lưu ra file</td></tr>
+          <tr><td><code class="inline">login</code></td><td><strong>none</strong></td><td>Test login phải đăng nhập <em>thật</em> để kiểm tra chức năng login</td></tr>
+          <tr><td><code class="inline">chromium</code></td><td><code class="inline">user-state.json</code></td><td>Mọi test user khác + e2e: tái sử dụng session</td></tr>
+          <tr><td><code class="inline">admin</code></td><td><code class="inline">admin-state.json</code></td><td>Test admin dùng session admin</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout note">
+        <span class="ico">i</span>
+        <div><strong>Dependencies chain:</strong> if setup-user fails (bad credentials), the <code class="inline">chromium</code> project is <em>skipped</em>, not failed randomly. Fix the credentials, re-run the setup, and the suite recovers.</div>
+      </div>
+
+      <h2><span class="sec-no">7.4</span>Validating the Session</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> A saved session can expire. That is why <code class="inline">authenticated-user.fixture.ts</code> adds the <code class="inline">userSession</code> fixture (TC-06): before the test, it visits the home page and asserts the site does <em>not</em> bounce back to login.</p>
+        <p><span class="lang vi">VI</span> Session đã lưu có thể hết hạn. Đó là lý do <code class="inline">authenticated-user.fixture.ts</code> thêm fixture <code class="inline">userSession</code> (TC-06): trước test, nó mở trang chủ và assert site không bị hất về trang login.</p>
+      </div>
+
+      <div class="callout warn">
+        <span class="ico">!</span>
+        <div><strong>Security:</strong> <code class="inline">storage/</code> contains real session cookies — it is git-ignored. Never commit it, never share it. Same for <code class="inline">.env</code>.</div>
+      </div>
+
+      <h2><span class="sec-no">7.5</span>When the Session Breaks</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> Symptoms: tests fail with "User session is not valid" or suddenly bounce to the login page. Fix:</p>
+        <p><span class="lang vi">VI</span> Triệu chứng: test fail với "User session is not valid" hoặc bị hất về trang login. Cách xử lý:</p>
+      </div>
+
+      <div class="code"><span class="code-lang">bash</span>
+<pre><code># 1. verify the credentials still work in a browser
+# 2. re-run the setup projects
+npx playwright test --project=setup-user --project=setup-admin</code></pre>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-title">Exercise · Bài tập</div>
+        <ol>
+          <li>Chạy riêng setup project và xác nhận <code class="inline">storage/user-state.json</code> được tạo.</li>
+          <li>Mở file đó — quan sát cấu trúc (cookie, origins). <strong>Đừng commit file này.</strong></li>
+          <li>Xóa file <code class="inline">storage/user-state.json</code>, chạy <code class="inline">npm run test:cart</code> — ghi lại điều gì xảy ra (project bị skip?).</li>
+          <li>Chạy lại setup rồi chạy lại test — suite hồi phục chưa?</li>
+        </ol>
+      </div>
+
+      <section class="test-report">
+        <div class="tr-head"><span class="dot"></span> Test Report · Báo cáo kiểm thử</div>
+        <div class="tr-body">
+          <p><span class="lang">EN</span> Tests reuse one login instead of repeating it. Next: keeping test data out of the code — JSON, Excel and .env.</p>
+          <p><span class="lang vi">VI</span> Test tái sử dụng một lần đăng nhập thay vì lặp lại. Bài tiếp theo: tách test data khỏi code — JSON, Excel và .env.</p>
+          <button class="btn-pass" id="btn-pass"><span class="tick">+</span><span class="btn-label">Mark lesson as passed</span></button>
+        </div>
+      </section>
+    </main>
+
+    <nav class="pager" id="pager"></nav>
+    <footer class="site-foot">AutoPath AI Course · TC-07</footer>
+  </div>
+</div>
+<script src="assets/nav.js"></script>
+<script src="assets/main.js"></script>
+</body>
+</html>

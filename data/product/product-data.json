@@ -1,0 +1,10 @@
+{
+  "product": {
+    "slug": "test-37",
+    "name": "test"
+  },
+  "output": {
+    "jsonPath": "output/products/product-details.json",
+    "excelPath": "output/products/product-details.xlsx"
+  }
+}

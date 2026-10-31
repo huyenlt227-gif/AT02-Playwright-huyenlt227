@@ -1,0 +1,30 @@
+{
+  "name": "autopath-ai",
+  "version": "1.0.0",
+  "description": "AutoPath AI - AI-supported Playwright Automation Framework for Manual Testers",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:login": "playwright test tests/user/login",
+    "test:profile": "playwright test tests/user/profile",
+    "test:product": "playwright test tests/user/product",
+    "test:cart": "playwright test tests/user/cart",
+    "test:checkout": "playwright test tests/user/checkout",
+    "test:admin": "playwright test tests/admin",
+    "test:e2e": "playwright test tests/e2e",
+    "test:setup": "playwright test setup",
+    "test:chromium": "playwright test --project=chromium",
+    "test:all-browsers": "playwright test --project=chromium --project=firefox --project=webkit",
+    "test:demo": "playwright test --project=chromium --workers=1",
+    "report": "playwright show-report",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.55.0",
+    "@types/node": "^20.17.6",
+    "dotenv": "^16.4.5",
+    "exceljs": "^4.4.0",
+    "typescript": "^5.6.3"
+  }
+}

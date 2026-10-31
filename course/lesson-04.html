@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TC-04 · Locators &amp; Assertions — AutoPath AI Course</title>
+<link rel="stylesheet" href="assets/styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="stage">
+    <header class="topbar">
+      <button class="menu-btn" id="menu-btn" aria-label="Toggle menu">☰</button>
+      <div class="crumb" id="crumb"></div>
+      <div class="spacer"></div>
+      <span class="lang-switch">EN · VI</span>
+    </header>
+
+    <main class="content">
+      <section class="tc-card">
+        <div class="tc-strip">
+          <span class="tc-badge">TC-04</span>
+          <span class="tc-status" id="tc-status">TODO</span>
+          <span class="tc-meta"><span class="lv">Beginner</span><span>≈ 35 min</span></span>
+        </div>
+        <div class="tc-body">
+          <h1 class="tc-title-en">Locators &amp; Assertions</h1>
+          <p class="tc-title-vi">Locators &amp; Assertions</p>
+          <div class="tc-grid">
+            <div class="tc-cell">
+              <div class="cell-label">Preconditions · Tiền đề</div>
+              <ul>
+                <li>Hoàn thành TC-03</li>
+                <li>Biết sơ qua CSS selector</li>
+              </ul>
+            </div>
+            <div class="tc-cell expected">
+              <div class="cell-label">Expected Result · Sau bài này bạn làm được</div>
+              <ul>
+                <li>Viết locator ổn định, mang ý nghĩa nghiệp vụ</li>
+                <li>Hiểu auto-waiting — vì sao không cần <code class="inline">sleep()</code></li>
+                <li>Dùng đúng các assertion phổ biến</li>
+                <li>Viết thông điệp fail dễ đọc</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <h2><span class="sec-no">4.1</span>What Is a Locator?</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> A locator is <strong>how you tell the robot which element to touch</strong>. It is like a GPS coordinate for an element on the page. Look at the locators in <code class="inline">pages/user/LoginPage.ts</code>:</p>
+        <p><span class="lang vi">VI</span> Locator là <strong>cách bạn chỉ cho robot biết chạm vào phần tử nào</strong>. Nó giống tọa độ GPS cho một phần tử trên trang. Nhìn các locator trong <code class="inline">pages/user/LoginPage.ts</code>:</p>
+      </div>
+
+      <div class="code"><span class="code-lang">TypeScript</span>
+<pre><code>private readonly emailInput = this.page.locator('#email');
+private readonly passwordInput = this.page.locator('#password');
+private readonly loginButton = this.page.locator('button:has-text("Login")');
+private readonly errorNotification = this.page.locator('[data-notify="message"]');
+private readonly loginTitle = this.page.locator('h1:has-text("Login to your account")');</code></pre>
+      </div>
+
+      <table class="data">
+        <thead>
+          <tr><th>Selector</th><th>Meaning · Ý nghĩa</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code class="inline">#email</code></td><td>Element có <code class="inline">id="email"</code> — ổn định nhất</td></tr>
+          <tr><td><code class="inline">button:has-text("Login")</code></td><td>Nút <code class="inline">&lt;button&gt;</code> có chữ "Login" — theo ý nghĩa nghiệp vụ</td></tr>
+          <tr><td><code class="inline">[data-notify="message"]</code></td><td>Element có attribute <code class="inline">data-notify</code> — theo attribute ổn định</td></tr>
+          <tr><td><code class="inline">h1:has-text("...")</code></td><td>Heading chứa text — dùng để xác nhận "đang ở đúng trang"</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout warn">
+        <span class="ico">!</span>
+        <div><strong>Bad locator habits:</strong> avoid positional selectors like <code class="inline">div:nth-child(3) &gt; span</code> and brittle text like <code class="inline">text=Welcome back John</code> (breaks when the name changes). Prefer <code class="inline">id</code>, stable attributes, and business-meaningful text.</div>
+      </div>
+
+      <h2><span class="sec-no">4.2</span>Auto-Waiting: Why We Never Sleep</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> Manual testers instinctively pause ("wait for the page to load"). Playwright does this automatically: before every action it <strong>waits for the element to be visible, enabled and stable</strong>, up to a timeout. Random <code class="inline">sleep()</code> calls are slower and flakier — they wait even when nothing needs waiting.</p>
+        <p><span class="lang vi">VI</span> Manual Tester có thói quen dừng lại chờ ("đợi trang load"). Playwright làm việc đó tự động: trước mỗi thao tác nó <strong>chờ phần tử hiển thị, bật và ổn định</strong>, tối đa theo timeout. Gọi <code class="inline">sleep()</code> lung tung vừa chậm vừa dễ flaky — nó chờ cả khi không cần chờ.</p>
+      </div>
+
+      <div class="code"><span class="code-lang">TypeScript</span>
+<pre><code>// ❌ Manual-Tester instinct — slow and flaky
+await page.waitForTimeout(5000);
+await page.click('#login-button');
+
+// ✅ Playwright way — waits only as long as needed
+await page.locator('#login-button').click();</code></pre>
+      </div>
+
+      <h2><span class="sec-no">4.3</span>Assertions Are Your Expected Results</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> An assertion is your <strong>expected result written in code</strong>. Playwright's <code class="inline">expect</code> also auto-waits, so it retries until the condition holds or the timeout expires. Common ones used in this project:</p>
+        <p><span class="lang vi">VI</span> Assertion chính là <strong>expected result viết bằng code</strong>. <code class="inline">expect</code> của Playwright cũng auto-wait — nó thử lại cho đến khi điều kiện đúng hoặc hết timeout. Các loại thường dùng trong dự án:</p>
+      </div>
+
+      <div class="code"><span class="code-lang">TypeScript</span>
+<pre><code>// Element is visible (auto-waits)
+await expect(locator, 'Dashboard page is NOT displayed after login').toBeVisible();
+
+// Text contains a substring (e.g. error message)
+expect(message).toContain('Invalid login credentials');
+
+// Element text equals exactly
+await expect(this.productTitle).toHaveText('test');
+
+// Boolean condition is true
+expect(await loginPage.isOnLoginPage()).toBe(true);</code></pre>
+      </div>
+
+      <table class="data">
+        <thead>
+          <tr><th>Assertion</th><th>Checks · Kiểm tra</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code class="inline">toBeVisible()</code></td><td>Phần tử hiển thị trên màn hình</td></tr>
+          <tr><td><code class="inline">toContainText(...)</code> / <code class="inline">toContain(...)</code></td><td>Text chứa chuỗi con</td></tr>
+          <tr><td><code class="inline">toHaveText(...)</code></td><td>Text bằng chính xác giá trị</td></tr>
+          <tr><td><code class="inline">toBeTruthy()</code> / <code class="inline">toBe(true)</code></td><td>Giá trị boolean / truthy</td></tr>
+          <tr><td><code class="inline">toBeGreaterThan(...)</code></td><td>Số lớn hơn ngưỡng (ví dụ độ dài mã đơn hàng)</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout note">
+        <span class="ico">i</span>
+        <div><strong>Second argument = failure message.</strong> <code class="inline">expect(locator, 'Dashboard page is NOT displayed after login')</code> — when the assertion fails, your message appears in the report, so you instantly know <em>what</em> broke without reading the trace.</div>
+      </div>
+
+      <h2><span class="sec-no">4.4</span>Robust Patterns in This Project</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> The framework centralizes fragile interactions in <code class="inline">pages/common/BasePage.ts</code>. Notice how helpers wait for visibility <em>before</em> acting, and how popups that would intercept clicks are dismissed:</p>
+        <p><span class="lang vi">VI</span> Framework gom các thao tác dễ vỡ vào <code class="inline">pages/common/BasePage.ts</code>. Chú ý cách các helper chờ hiển thị <em>trước khi</em> thao tác, và cách popup chặn click bị đóng đi:</p>
+      </div>
+
+      <div class="code"><span class="code-lang">TypeScript</span>
+<pre><code>protected async click(locator: Locator): Promise&lt;void&gt; {
+  await locator.waitFor({ state: 'visible' });
+  await locator.click();
+}
+
+protected async fill(locator: Locator, value: string): Promise&lt;void&gt; {
+  await locator.waitFor({ state: 'visible' });
+  await locator.fill(value);
+}
+
+async closeAnnoyingPopups(): Promise&lt;void&gt; {
+  // closes the demo popup + cookie banner that would swallow clicks
+}</code></pre>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-title">Exercise · Bài tập</div>
+        <ol>
+          <li>Mở trang login trong trình duyệt, dùng DevTools tìm <code class="inline">#email</code>, <code class="inline">#password</code> và nút Login.</li>
+          <li>Viết 3 cách khác nhau để locate nút Login (ví dụ: <code class="inline">button:has-text("Login")</code>, <code class="inline">input[type="submit"]</code>, <code class="inline">form button</code>).</li>
+          <li>Trong <code class="inline">LoginPage.ts</code>, thêm một assertion có thông điệp fail rõ ràng cho trường hợp dashboard không hiển thị.</li>
+          <li>Chạy <code class="inline">npm run test:login</code> — nếu mọi thứ xanh, bạn đã nắm được locator + assertion.</li>
+        </ol>
+      </div>
+
+      <section class="test-report">
+        <div class="tr-head"><span class="dot"></span> Test Report · Báo cáo kiểm thử</div>
+        <div class="tr-body">
+          <p><span class="lang">EN</span> You can now point the robot at elements and verify results. Next: the Page Object Model — the pattern that keeps locators out of your tests.</p>
+          <p><span class="lang vi">VI</span> Bạn đã chỉ được robot đến phần tử và kiểm tra kết quả. Bài tiếp theo: Page Object Model — pattern giữ locator không nằm trong test.</p>
+          <button class="btn-pass" id="btn-pass"><span class="tick">+</span><span class="btn-label">Mark lesson as passed</span></button>
+        </div>
+      </section>
+    </main>
+
+    <nav class="pager" id="pager"></nav>
+    <footer class="site-foot">AutoPath AI Course · TC-04</footer>
+  </div>
+</div>
+<script src="assets/nav.js"></script>
+<script src="assets/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TC-05 · Page Object Model — AutoPath AI Course</title>
+<link rel="stylesheet" href="assets/styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="stage">
+    <header class="topbar">
+      <button class="menu-btn" id="menu-btn" aria-label="Toggle menu">☰</button>
+      <div class="crumb" id="crumb"></div>
+      <div class="spacer"></div>
+      <span class="lang-switch">EN · VI</span>
+    </header>
+
+    <main class="content">
+      <section class="tc-card">
+        <div class="tc-strip">
+          <span class="tc-badge">TC-05</span>
+          <span class="tc-status" id="tc-status">TODO</span>
+          <span class="tc-meta"><span class="lv">Core</span><span>≈ 40 min</span></span>
+        </div>
+        <div class="tc-body">
+          <h1 class="tc-title-en">Page Object Model (POM)</h1>
+          <p class="tc-title-vi">Page Object Model (POM)</p>
+          <div class="tc-grid">
+            <div class="tc-cell">
+              <div class="cell-label">Preconditions · Tiền đề</div>
+              <ul>
+                <li>Hoàn thành TC-04 (locator + assertion)</li>
+                <li>Đã mở <code class="inline">pages/</code> trong repo</li>
+              </ul>
+            </div>
+            <div class="tc-cell expected">
+              <div class="cell-label">Expected Result · Sau bài này bạn làm được</div>
+              <ul>
+                <li>Giải thích vì sao POM tồn tại</li>
+                <li>Đọc hiểu <code class="inline">BasePage</code> và một page object cụ thể</li>
+                <li>Phân biệt "method nghiệp vụ" và "selector thô"</li>
+                <li>Thêm một method mới vào page object</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <h2><span class="sec-no">5.1</span>The Problem POM Solves</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> Imagine writing 30 tests that all click the Login button. Without a page object, the selector <code class="inline">button:has-text("Login")</code> is pasted into 30 places. When the developer changes the button, you fix 30 tests. With POM, the selector lives <strong>once</strong>, inside the page class — you fix <strong>one file</strong>.</p>
+        <p><span class="lang vi">VI</span> Tưởng tượng viết 30 test cùng bấm nút Login. Không có page object, selector <code class="inline">button:has-text("Login")</code> bị dán vào 30 chỗ. Khi dev đổi nút, bạn sửa 30 test. Với POM, selector nằm <strong>duy nhất một chỗ</strong>, trong class của trang — bạn sửa <strong>một file</strong>.</p>
+      </div>
+
+      <div class="callout note">
+        <span class="ico">i</span>
+        <div><strong>Rule of thumb:</strong> tests speak <em>business</em> ("login with these credentials"), page objects speak <em>browser</em> ("fill #email, click button"). Keep the two vocabularies separate.</div>
+      </div>
+
+      <h2><span class="sec-no">5.2</span>BasePage: the Shared Toolkit</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> Every page object extends <code class="inline">BasePage</code> (<code class="inline">pages/common/BasePage.ts</code>), which centralizes what every page needs: navigation, popup handling, and safe helpers.</p>
+        <p><span class="lang vi">VI</span> Mọi page object đều kế thừa <code class="inline">BasePage</code> (<code class="inline">pages/common/BasePage.ts</code>) — nơi gom các thứ mọi trang đều cần: điều hướng, xử lý popup, và các helper an toàn.</p>
+      </div>
+
+      <div class="code"><span class="code-lang">TypeScript</span>
+<pre><code>export abstract class BasePage {
+  constructor(protected readonly page: Page) {}
+
+  protected async goto(url: string): Promise&lt;void&gt; {
+    await this.page.goto(url, { waitUntil: 'domcontentloaded' });
+  }
+
+  async closeAnnoyingPopups(): Promise&lt;void&gt; { /* demo popup + cookie */ }
+
+  protected async getText(locator: Locator): Promise&lt;string&gt; {
+    await locator.waitFor({ state: 'visible' });
+    return ((await locator.textContent()) ?? '').trim();
+  }
+
+  protected async expectVisible(locator: Locator, description: string): Promise&lt;void&gt; {
+    await expect(locator, description).toBeVisible();
+  }
+
+  protected async click(locator: Locator): Promise&lt;void&gt; {
+    await locator.waitFor({ state: 'visible' });
+    await locator.click();
+  }
+
+  protected async fill(locator: Locator, value: string): Promise&lt;void&gt; {
+    await locator.waitFor({ state: 'visible' });
+    await locator.fill(value);
+  }
+}</code></pre>
+      </div>
+
+      <div class="bil">
+        <p><span class="lang">EN</span> Note the <code class="inline">protected</code> keyword: helpers are visible to subclasses but not to tests. Tests only ever see <em>public business methods</em>.</p>
+        <p><span class="lang vi">VI</span> Chú ý từ khóa <code class="inline">protected</code>: helper chỉ dùng trong class con, không lộ ra test. Test chỉ thấy <em>method nghiệp vụ public</em>.</p>
+      </div>
+
+      <h2><span class="sec-no">5.3</span>A Concrete Page Object: LoginPage</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> <code class="inline">pages/user/LoginPage.ts</code> owns the login screen: its locators (private) and its business actions (public).</p>
+        <p><span class="lang vi">VI</span> <code class="inline">pages/user/LoginPage.ts</code> sở hữu màn hình login: locator (private) và hành động nghiệp vụ (public).</p>
+      </div>
+
+      <div class="code"><span class="code-lang">TypeScript</span>
+<pre><code>export class LoginPage extends BasePage {
+  private readonly emailInput = this.page.locator('#email');
+  private readonly loginButton = this.page.locator('button:has-text("Login")');
+  private readonly dashboardTitle = this.page.locator('h1:has-text("Dashboard")');
+
+  async open(): Promise&lt;void&gt; {
+    await this.goto(`${Env.USER_BASE_URL}/users/login`);
+    await this.closeAnnoyingPopups();
+    await this.expectVisible(this.loginTitle, 'Customer login page is not displayed');
+  }
+
+  async loginSuccess(email: string, password: string): Promise&lt;void&gt; {
+    await this.login(email, password);
+    await this.expectVisible(this.dashboardTitle, 'Dashboard page is NOT displayed after login');
+  }
+
+  async loginExpectFailure(email: string, password: string): Promise&lt;string&gt; {
+    await this.login(email, password);
+    await this.waitForVisible(this.errorNotification);
+    return this.getErrorMessage();
+  }
+}</code></pre>
+      </div>
+
+      <table class="data">
+        <thead>
+          <tr><th>Method</th><th>Business meaning · Ý nghĩa nghiệp vụ</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code class="inline">open()</code></td><td>Mở trang login và xác nhận đã tới đúng trang</td></tr>
+          <tr><td><code class="inline">login(email, password)</code></td><td>Điền form và submit, chưa assert kết quả</td></tr>
+          <tr><td><code class="inline">loginSuccess(...)</code></td><td>Login và assert dashboard hiển thị</td></tr>
+          <tr><td><code class="inline">loginExpectFailure(...)</code></td><td>Login với dữ liệu sai và trả về thông báo lỗi</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout note">
+        <span class="ico">i</span>
+        <div><strong>Read the test again (TC-03):</strong> the test never mentions <code class="inline">#email</code> or <code class="inline">button</code>. It calls <code class="inline">loginPage.loginExpectFailure(...)</code> — pure business language. That is the payoff of POM.</div>
+      </div>
+
+      <h2><span class="sec-no">5.4</span>Handling Real-World Messiness</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> Real sites are messy. Notice how <code class="inline">LoginPage.login()</code> defends against the demo popup swallowing the click — this kind of resilience lives in the page object, invisible to tests:</p>
+        <p><span class="lang vi">VI</span> Website thật thì bừa bộn. Chú ý cách <code class="inline">LoginPage.login()</code> phòng thủ khi popup demo nuốt mất cú click — loại "chống chịu" này nằm trong page object, test không thấy:</p>
+      </div>
+
+      <div class="code"><span class="code-lang">TypeScript</span>
+<pre><code>async login(email: string, password: string): Promise&lt;void&gt; {
+  await this.fill(this.emailInput, email);
+  await this.fill(this.passwordInput, password);
+  await this.click(this.loginButton);
+
+  // Safety net: if a popup reappeared and swallowed the click,
+  // close it and retry the click once.
+  await this.page.waitForTimeout(800);
+  if (await this.page.locator('.website-popup').isVisible().catch(() =&gt; false)) {
+    await this.closeAnnoyingPopups();
+    await this.click(this.loginButton);
+  }
+}</code></pre>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-title">Exercise · Bài tập</div>
+        <ol>
+          <li>Mở <code class="inline">pages/user/ProfilePage.ts</code> — liệt kê các method nghiệp vụ public của nó.</li>
+          <li>Thêm method <code class="inline">getNameValue()</code> (nếu chưa có): trả về text của ô tên trong form hồ sơ.</li>
+          <li>Trong <code class="inline">tests/user/profile/update-profile.spec.ts</code>, thêm một bước assert tên hiện tại không rỗng (nếu chưa có).</li>
+          <li>Chạy <code class="inline">npm run test:profile</code> và xác nhận xanh.</li>
+        </ol>
+      </div>
+
+      <section class="test-report">
+        <div class="tr-head"><span class="dot"></span> Test Report · Báo cáo kiểm thử</div>
+        <div class="tr-body">
+          <p><span class="lang">EN</span> You understand the core pattern of the whole framework. Next: fixtures — how page objects reach your tests without a single <code class="inline">new</code> statement.</p>
+          <p><span class="lang vi">VI</span> Bạn đã hiểu pattern cốt lõi của toàn framework. Bài tiếp theo: fixtures — cách page object đến tay test mà không cần một câu lệnh <code class="inline">new</code> nào.</p>
+          <button class="btn-pass" id="btn-pass"><span class="tick">+</span><span class="btn-label">Mark lesson as passed</span></button>
+        </div>
+      </section>
+    </main>
+
+    <nav class="pager" id="pager"></nav>
+    <footer class="site-foot">AutoPath AI Course · TC-05</footer>
+  </div>
+</div>
+<script src="assets/nav.js"></script>
+<script src="assets/main.js"></script>
+</body>
+</html>

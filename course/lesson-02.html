@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TC-02 · Setup &amp; Project Structure — AutoPath AI Course</title>
+<link rel="stylesheet" href="assets/styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="stage">
+    <header class="topbar">
+      <button class="menu-btn" id="menu-btn" aria-label="Toggle menu">☰</button>
+      <div class="crumb" id="crumb"></div>
+      <div class="spacer"></div>
+      <span class="lang-switch">EN · VI</span>
+    </header>
+
+    <main class="content">
+      <section class="tc-card">
+        <div class="tc-strip">
+          <span class="tc-badge">TC-02</span>
+          <span class="tc-status" id="tc-status">TODO</span>
+          <span class="tc-meta"><span class="lv">Beginner</span><span>≈ 30 min</span></span>
+        </div>
+        <div class="tc-body">
+          <h1 class="tc-title-en">Setup &amp; Project Structure</h1>
+          <p class="tc-title-vi">Cài đặt &amp; Cấu trúc dự án</p>
+          <div class="tc-grid">
+            <div class="tc-cell">
+              <div class="cell-label">Preconditions · Tiền đề</div>
+              <ul>
+                <li>Hoàn thành TC-01</li>
+                <li>Máy có Node.js 18+ và npm</li>
+              </ul>
+            </div>
+            <div class="tc-cell expected">
+              <div class="cell-label">Expected Result · Sau bài này bạn làm được</div>
+              <ul>
+                <li>Cài dependencies và trình duyệt Playwright</li>
+                <li>Giải thích ý nghĩa từng thư mục trong repo</li>
+                <li>Điền đúng <code class="inline">.env</code> từ <code class="inline">.env.example</code></li>
+                <li>Đọc được các script trong <code class="inline">package.json</code></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <h2><span class="sec-no">2.1</span>Install the Dependencies</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> Open a terminal in the project root and run:</p>
+        <p><span class="lang vi">VI</span> Mở terminal tại thư mục gốc của dự án và chạy:</p>
+      </div>
+
+      <div class="code"><span class="code-lang">bash</span>
+<pre><code>npm install
+npx playwright install</code></pre>
+      </div>
+
+      <div class="bil">
+        <p><span class="lang">EN</span> The first command installs Playwright, TypeScript and the helpers. The second downloads the browser binaries (Chromium, Firefox, WebKit) that the tests drive. This happens once.</p>
+        <p><span class="lang vi">VI</span> Lệnh đầu cài Playwright, TypeScript và các thư viện hỗ trợ. Lệnh thứ hai tải trình duyệt (Chromium, Firefox, WebKit) mà test sẽ điều khiển. Chỉ cần chạy một lần.</p>
+      </div>
+
+      <h2><span class="sec-no">2.2</span>Configure .env</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> Secrets and URLs never live inside test code. Copy the example file and fill in real values:</p>
+        <p><span class="lang vi">VI</span> Mật khẩu và URL không bao giờ nằm trong code test. Copy file mẫu và điền giá trị thật:</p>
+      </div>
+
+      <div class="code"><span class="code-lang">bash</span>
+<pre><code>cp .env.example .env</code></pre>
+      </div>
+
+      <table class="data">
+        <thead>
+          <tr><th>Variable</th><th>Meaning · Ý nghĩa</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code class="inline">USER_BASE_URL</code></td><td>Storefront URL (phía khách hàng)</td></tr>
+          <tr><td><code class="inline">ADMIN_BASE_URL</code></td><td>Admin login URL</td></tr>
+          <tr><td><code class="inline">CUSTOMER_EMAIL / CUSTOMER_PASSWORD</code></td><td>Tài khoản khách dùng cho test cần đăng nhập</td></tr>
+          <tr><td><code class="inline">ADMIN_EMAIL / ADMIN_PASSWORD</code></td><td>Tài khoản admin dùng cho test admin</td></tr>
+          <tr><td><code class="inline">DEFAULT_TIMEOUT</code></td><td>Global timeout (ms), mặc định 30000</td></tr>
+          <tr><td><code class="inline">WORKERS</code></td><td>Số worker chạy song song, mặc định 2</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout fail">
+        <span class="ico">✕</span>
+        <div><strong>Never commit <code class="inline">.env</code> or <code class="inline">storage/</code>.</strong> Both are already git-ignored. The demo accounts (<code class="inline">customer@example.com</code> / <code class="inline">123456</code>) may stop working when the demo site resets — see TC-11.</div>
+      </div>
+
+      <h2><span class="sec-no">2.3</span>Walk the Folder Tree</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> The structure follows a clear convention — every folder has one job:</p>
+        <p><span class="lang vi">VI</span> Cấu trúc tuân theo một quy ước rõ ràng — mỗi thư mục có đúng một nhiệm vụ:</p>
+      </div>
+
+      <table class="data">
+        <thead>
+          <tr><th>Folder · Thư mục</th><th>Job · Nhiệm vụ</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code class="inline">pages/</code></td><td>Page Object Model — mỗi màn hình là một class (TC-05)</td></tr>
+          <tr><td><code class="inline">fixtures/</code></td><td>Fixture — cấp sẵn page object cho từng test (TC-06)</td></tr>
+          <tr><td><code class="inline">tests/</code></td><td>File test theo module: <code class="inline">user/</code>, <code class="inline">admin/</code>, <code class="inline">e2e/</code></td></tr>
+          <tr><td><code class="inline">data/</code></td><td>Test data dạng JSON, tách khỏi code (TC-08)</td></tr>
+          <tr><td><code class="inline">utils/</code></td><td>Tiện ích: đọc env, JSON, Excel, logger, so sánh dữ liệu</td></tr>
+          <tr><td><code class="inline">setup/</code></td><td>Đăng nhập một lần, lưu session (TC-07)</td></tr>
+          <tr><td><code class="inline">storage/</code></td><td>Session đã lưu (git-ignored)</td></tr>
+          <tr><td><code class="inline">output/</code></td><td>Dữ liệu sản phẩm capture được (git-ignored)</td></tr>
+          <tr><td><code class="inline">logs/</code>, <code class="inline">test-results/</code>, <code class="inline">playwright-report/</code></td><td>Log, screenshot/video/trace, HTML report (TC-10)</td></tr>
+        </tbody>
+      </table>
+
+      <h2><span class="sec-no">2.4</span>The npm Scripts</h2>
+      <div class="bil">
+        <p><span class="lang">EN</span> <code class="inline">package.json</code> defines ready-made commands. You almost never need to type the raw <code class="inline">playwright test</code> command:</p>
+        <p><span class="lang vi">VI</span> <code class="inline">package.json</code> định nghĩa sẵn các lệnh. Bạn gần như không cần gõ lệnh <code class="inline">playwright test</code> thô:</p>
+      </div>
+
+      <table class="data">
+        <thead>
+          <tr><th>Command · Lệnh</th><th>Runs · Chạy gì</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code class="inline">npm test</code></td><td>Toàn bộ suite (setup + tất cả project)</td></tr>
+          <tr><td><code class="inline">npm run test:login</code></td><td>Chỉ module login</td></tr>
+          <tr><td><code class="inline">npm run test:profile</code> / <code class="inline">test:product</code> / <code class="inline">test:cart</code> / <code class="inline">test:checkout</code> / <code class="inline">test:admin</code> / <code class="inline">test:e2e</code></td><td>Từng module riêng lẻ</td></tr>
+          <tr><td><code class="inline">npm run test:all-browsers</code></td><td>Chromium + Firefox + WebKit</td></tr>
+          <tr><td><code class="inline">npm run test:demo</code></td><td>Chromium, 1 worker, chạy tuần tự</td></tr>
+          <tr><td><code class="inline">npm run report</code></td><td>Mở HTML report</td></tr>
+          <tr><td><code class="inline">npm run typecheck</code></td><td>Kiểm tra kiểu TypeScript (<code class="inline">tsc --noEmit</code>)</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout note">
+        <span class="ico">i</span>
+        <div><strong>Sanity check:</strong> run <code class="inline">npm run typecheck</code> now. Zero errors means your environment is ready.</div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-title">Exercise · Bài tập</div>
+        <ol>
+          <li>Chạy <code class="inline">npm install</code> và <code class="inline">npx playwright install</code> (nếu chưa).</li>
+          <li>Copy <code class="inline">.env.example</code> thành <code class="inline">.env</code> và điền thông tin tài khoản.</li>
+          <li>Chạy <code class="inline">npm run typecheck</code> — xác nhận 0 lỗi.</li>
+          <li>Mở <code class="inline">package.json</code>, chọn 3 script và đoán xem mỗi script chạy project nào trong <code class="inline">playwright.config.ts</code>.</li>
+        </ol>
+      </div>
+
+      <section class="test-report">
+        <div class="tr-head"><span class="dot"></span> Test Report · Báo cáo kiểm thử</div>
+        <div class="tr-body">
+          <p><span class="lang">EN</span> Your machine is ready and you can navigate the project. Next: write and run your first test.</p>
+          <p><span class="lang vi">VI</span> Máy đã sẵn sàng và bạn điều hướng được dự án. Bài tiếp theo: viết và chạy test đầu tiên.</p>
+          <button class="btn-pass" id="btn-pass"><span class="tick">+</span><span class="btn-label">Mark lesson as passed</span></button>
+        </div>
+      </section>
+    </main>
+
+    <nav class="pager" id="pager"></nav>
+    <footer class="site-foot">AutoPath AI Course · TC-02</footer>
+  </div>
+</div>
+<script src="assets/nav.js"></script>
+<script src="assets/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+{
+  "invalidEmail": "invalid@example.com",
+  "invalidPassword": "WrongPass123",
+  "expectedInvalidCredentialsMessage": "Invalid login credentials"
+}
